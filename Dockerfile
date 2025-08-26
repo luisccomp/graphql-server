@@ -1,14 +1,15 @@
-FROM node:20-alpine AS builder
+# Build stage
+FROM node:20-bullseye AS build
 WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY package*.json ./
+RUN npm install --omit=dev
 COPY . .
-RUN yarn build
+RUN npm run build
 
-FROM node:20-alpine AS runner
+# Production stage
+FROM node:20-alpine AS prod
 WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/yarn.lock ./
-RUN yarn install --frozen-lockfile --production
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/dist ./dist
+RUN npm install --omit=dev --ignore-scripts
 CMD ["node", "dist/index.js"]
