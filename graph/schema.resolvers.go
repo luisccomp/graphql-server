@@ -11,14 +11,34 @@ import (
 	"github.com/luisccomp/graphql-server/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// AddCategory is the resolver for the addCategory field.
+func (r *mutationResolver) AddCategory(ctx context.Context, input model.NewCategoryInput) (*model.Category, error) {
+	category, err := r.CategoryDB.Create(input.Name, *input.Description)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Category{
+		ID:          category.ID,
+		Name:        category.Name,
+		Description: &category.Description,
+	}, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// AddCourse is the resolver for the addCourse field.
+func (r *mutationResolver) AddCourse(ctx context.Context, input model.NewCourseInput) (*model.Course, error) {
+	panic(fmt.Errorf("not implemented: AddCourse - addCourse"))
+}
+
+// Categories is the resolver for the categories field.
+func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
+	panic(fmt.Errorf("not implemented: Categories - categories"))
+}
+
+// Courses is the resolver for the courses field.
+func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
+	panic(fmt.Errorf("not implemented: Courses - courses"))
 }
 
 // Mutation returns MutationResolver implementation.
