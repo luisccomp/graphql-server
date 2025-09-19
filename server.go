@@ -29,15 +29,19 @@ func main() {
 
 	defer db.Close()
 
+	// Instanciando os objetos de acesso a dados (DAOs)
 	categoryDB := database.NewCategory(db)
+	courseDB := database.NewCourse(db)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
+	// Injetando os DAOs no resolver
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		CategoryDB: categoryDB,
+		CourseDB:   courseDB,
 	}}))
 
 	srv.AddTransport(transport.Options{})
