@@ -1,15 +1,16 @@
-# Build stage
-FROM node:20-bullseye AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install --omit=dev
-COPY . .
-RUN npm run build
+# syntax=docker/dockerfile:1
 
-# Production stage
-FROM node:20-alpine AS prod
+# Build stage
+FROM golang:1.21-alpine AS builder
 WORKDIR /app
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/dist ./dist
-RUN npm install --omit=dev --ignore-scripts
-CMD ["node", "dist/index.js"]
+COPY go.mod .
+COPY . .
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux go build -o server .
+
+# Run stage
+FROM scratch
+WORKDIR /app
+COPY --from=builder /app/server ./
+EXPOSE 8080
+ENTRYPOINT ["./server"]
